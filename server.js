@@ -27,17 +27,12 @@ const limiter = rateLimit({
 
 app.use('/send-email', limiter);
 
-// Handle undefined ALLOWED_ORIGINS
-
 let allowedOrigins = [];
 
 if (process.env.ALLOWED_ORIGINS) {
   allowedOrigins = process.env.ALLOWED_ORIGINS.split(',');
 } else {
   console.error('ERROR: ALLOWED_ORIGINS environment variable is not set.');
-  // Optionally, you can set allowedOrigins to '*' to allow all origins, but it's not recommended for security
-  // allowedOrigins = '*';
-  // For now, we'll prevent the server from starting
   process.exit(1);
 }
 
