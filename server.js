@@ -39,23 +39,26 @@ if (process.env.ALLOWED_ORIGINS) {
 }
 
 // CORS Configuration - Restrict to Your Domain
-app.use(
-  cors({
-    origin: function (origin, callback) {
+//app.use(
+ // cors({
+ //   origin: function (origin, callback) {
       // Allow requests with no origin (e.g., mobile apps, curl requests)
-      if (!origin) return callback(null, true);
-      if (allowedOrigins.indexOf(origin) !== -1) {
-        return callback(null, true);
-      } else {
-        const msg =
-          'The CORS policy for this site does not allow access from the specified origin.';
-        return callback(new Error(msg), false);
-      }
-    },
-    methods: ['GET', 'POST'],
-    allowedHeaders: ['Content-Type'],
-  })
-);
+   //   if (!origin) return callback(null, true);
+     // if (allowedOrigins.indexOf(origin) !== -1) {
+     //   return callback(null, true);
+    //  } else {
+    //    const msg =
+    //      'The CORS policy for this site does not allow access from the specified origin.';
+    //    return callback(new Error(msg), false);
+    //  }
+   // },
+   // methods: ['GET', 'POST'],
+   // allowedHeaders: ['Content-Type'],
+ // })
+ // );
+
+// Temporary CORS override for testing
+app.use(cors());
 
 // Body Parsing Middleware
 app.use(express.json());
