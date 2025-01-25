@@ -47,8 +47,7 @@ app.use(
       if (allowedOrigins.indexOf(origin) !== -1) {
         return callback(null, true);
       } else {
-        const msg =
-    //      'The CORS policy for this site does not allow access from the specified origin.';
+        const msg = 'The CORS policy for this site does not allow access from the specified origin.';
         return callback(new Error(msg), false);
       }
     },
