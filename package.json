@@ -1,9 +1,9 @@
 {
   "name": "solar-fix-solutions",
   "version": "1.0.0",
-  "main": "server.js", // Update this if your main file is server.js
+  "main": "server.js",
   "scripts": {
-    "start": "node server.js", // Add this line
+    "start": "node server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
