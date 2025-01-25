@@ -158,3 +158,20 @@ app.post(
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });
+
+
+
+app.get('/test-email', async (req, res) => {
+  try {
+      await transporter.sendMail({
+          from: process.env.SMTP_USER,
+          to: 'your-personal-email@gmail.com',
+          subject: 'SMTP Test',
+          text: 'This is a test email from Railway'
+      });
+      res.send('Email sent successfully');
+  } catch (error) {
+      console.error('SMTP Error:', error);
+      res.status(500).send('Failed to send email');
+  }
+});
