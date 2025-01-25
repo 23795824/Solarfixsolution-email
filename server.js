@@ -78,13 +78,17 @@ if (!process.env.SMTP_USER || !process.env.SMTP_PASS) {
   process.exit(1);
 }
 
-// Nodemailer Transporter Configuration
 const transporter = nodemailer.createTransport({
-  service: 'Gmail',
+  host: process.env.SMTP_HOST,
+  port: process.env.SMTP_PORT,
+  secure: false, // True for 465, false for other ports
   auth: {
     user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS,
+    pass: process.env.SMTP_PASS
   },
+  tls: {
+    rejectUnauthorized: false // Bypass SSL validation if needed
+  }
 });
 
 // Verify Transporter Connection Configuration
@@ -155,23 +159,24 @@ app.post(
 );
 
 // Start the Server
-app.listen(port, () => {
+const server = app.listen(port, '0.0.0.0', () => {
   console.log(`Server running on port ${port}`);
 });
 
-
-
-app.get('/test-email', async (req, res) => {
-  try {
-      await transporter.sendMail({
-          from: process.env.SMTP_USER,
-          to: 'your-personal-email@gmail.com',
-          subject: 'SMTP Test',
-          text: 'This is a test email from Railway'
-      });
-      res.send('Email sent successfully');
-  } catch (error) {
-      console.error('SMTP Error:', error);
-      res.status(500).send('Failed to send email');
-  }
+// Graceful shutdown handling
+process.on('SIGTERM', () => {
+  console.log('SIGTERM received: Closing server');
+  server.close(() => {
+    console.log('Server closed');
+    process.exit(0);
+  });
 });
+
+// Handle uncaught exceptions
+process.on('uncaughtException', (err) => {
+  console.error('Critical Error:', err);
+  server.close(() => process.exit(1));
+});
+
+
+
