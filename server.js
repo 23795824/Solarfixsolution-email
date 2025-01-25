@@ -27,10 +27,34 @@ const limiter = rateLimit({
 
 app.use('/send-email', limiter);
 
+// Handle undefined ALLOWED_ORIGINS
+
+let allowedOrigins = [];
+
+if (process.env.ALLOWED_ORIGINS) {
+  allowedOrigins = process.env.ALLOWED_ORIGINS.split(',');
+} else {
+  console.error('ERROR: ALLOWED_ORIGINS environment variable is not set.');
+  // Optionally, you can set allowedOrigins to '*' to allow all origins, but it's not recommended for security
+  // allowedOrigins = '*';
+  // For now, we'll prevent the server from starting
+  process.exit(1);
+}
+
 // CORS Configuration - Restrict to Your Domain
 app.use(
   cors({
-    origin: process.env.ALLOWED_ORIGINS.split(','),
+    origin: function (origin, callback) {
+      // Allow requests with no origin (e.g., mobile apps, curl requests)
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.indexOf(origin) !== -1) {
+        return callback(null, true);
+      } else {
+        const msg =
+          'The CORS policy for this site does not allow access from the specified origin.';
+        return callback(new Error(msg), false);
+      }
+    },
     methods: ['GET', 'POST'],
     allowedHeaders: ['Content-Type'],
   })
@@ -47,6 +71,12 @@ app.use(express.static(path.join(__dirname, 'public')));
 console.log('Environment Variables:');
 console.log('SMTP_USER:', process.env.SMTP_USER ? '***Exists***' : 'MISSING!');
 console.log('SMTP_PASS:', process.env.SMTP_PASS ? '***Exists***' : 'MISSING!');
+
+// Check for missing SMTP configuration
+if (!process.env.SMTP_USER || !process.env.SMTP_PASS) {
+  console.error('ERROR: SMTP_USER and SMTP_PASS environment variables are required.');
+  process.exit(1);
+}
 
 // Nodemailer Transporter Configuration
 const transporter = nodemailer.createTransport({
